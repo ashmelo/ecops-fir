@@ -1,0 +1,25 @@
+server:
+  port: 9092
+spring:
+  datasource:
+    name: ecops_fir
+    driverClassName: org.h2.Driver
+    initialize: false
+    url: jdbc:h2:file:~/ecops_fir;DB_CLOSE_ON_EXIT=FALSE;IFEXISTS=FALSE;DB_CLOSE_DELAY=-1;
+
+  h2:
+    console:
+      enabled: true
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+
+  main:
+    allow-bean-definition-overriding: true
+
+  application:
+    profileUrl: http://localhost:9090/profile/api/v1
+    adminUrl: http://localhost:9091/admin/api/v1
+

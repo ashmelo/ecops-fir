@@ -1,0 +1,5 @@
+package com.ecops.domain;
+
+public enum CrimeStatus {
+    ABANDONED_VEHICLE, FRADULENT_USAGES, HARASSING, HIT_AND_RUN, LOST_PROPERTY, THEFT, VEHICLE_BREAK_IN, VANDALISM
+}
