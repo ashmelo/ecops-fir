@@ -65,6 +65,26 @@ public class FirServiceImpl implements FirService {
         return firResponse;
     }
 
+    @Override
+    public FirResponse getFir(String userId, int firId) {
+        Fir fir = firRepository.findByUserIdAndFirId(userId,firId);
+        FirResponse firResponse = FirResponse.builder().firId(firId)
+                .crimeCommit(fir.getCrimeCommit())
+                .description(fir.getDescription())
+                .status(fir .getStatus())
+                .comments(fir.getComments())
+                .incidentDate(fir.getIncidentDate())
+                .filedDate(fir.getFiledDate())
+                .address(fir.getAddress())
+                .district(fir.getDistrict())
+                .place(fir.getPlace())
+                .state(fir.getState())
+                .pincode(fir.getPincode())
+                .mobileNumber(fir.getMobileNumber())
+                .build();
+        return firResponse;
+    }
+
     @Async
     private void assignPoliceStation(int firId) {
         try {

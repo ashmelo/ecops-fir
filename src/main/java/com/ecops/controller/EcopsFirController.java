@@ -3,6 +3,7 @@ package com.ecops.controller;
 
 import com.ecops.beans.AllFirResponse;
 import com.ecops.beans.FirRequest;
+import com.ecops.beans.FirResponse;
 import com.ecops.exception.BadRequestException;
 import com.ecops.service.FirService;
 import com.ecops.wrapper.TokenVerify;
@@ -46,10 +47,24 @@ public class EcopsFirController {
         try {
             if (tokenVerify.verifyToken(request, userId)) {
                 //firService.createFir(firRequest);
-                return new ResponseEntity<List<AllFirResponse>>(firService.getAllFir(userId),HttpStatus.OK);
+                return new ResponseEntity(firService.getAllFir(userId),HttpStatus.OK);
             }
         } catch (Exception e) {
             throw new BadRequestException("Error while fetching FIR");
+        }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
+
+    @GetMapping(value="/get_fir/{userId}/{firId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get all filed FIR's")
+    public ResponseEntity<FirResponse> getFir(HttpServletRequest request, @PathVariable("userId") String userId, @PathVariable("firId") int firId) {
+        try {
+            if (tokenVerify.verifyToken(request, userId)) {
+                //firService.createFir(firRequest);
+                return new ResponseEntity(firService.getFir(userId,firId),HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            throw new BadRequestException("Error while fetching FIR with id {" + firId +"}");
         }
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
