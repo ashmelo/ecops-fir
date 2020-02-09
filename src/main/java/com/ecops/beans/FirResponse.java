@@ -25,6 +25,8 @@ public class FirResponse {
     private String district;
     private String state;
     private int pincode;
+    private String policeOfficerName;
+    private String stationName;
     private String status;
     private String comments;
 

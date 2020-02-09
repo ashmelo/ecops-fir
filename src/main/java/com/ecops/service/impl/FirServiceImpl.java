@@ -71,6 +71,8 @@ public class FirServiceImpl implements FirService {
         FirResponse firResponse = FirResponse.builder().firId(firId)
                 .crimeCommit(fir.getCrimeCommit())
                 .description(fir.getDescription())
+                .policeOfficerName(fir.getPoliceOfficerName())
+                .stationName(fir.getStationName())
                 .status(fir .getStatus())
                 .comments(fir.getComments())
                 .incidentDate(fir.getIncidentDate())
