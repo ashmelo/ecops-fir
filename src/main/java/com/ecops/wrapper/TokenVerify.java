@@ -6,6 +6,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import com.ecops.beans.FirRequest;
+import com.ecops.beans.PoliceDetailsResponse;
 import com.ecops.beans.UserResponse;
 import com.ecops.exception.BadRequestException;
 import com.ecops.parameter.ApplicationParameter;
@@ -60,6 +61,41 @@ public class TokenVerify {
             throw new BadRequestException("Token not provided");
         } catch (Exception e) {
             throw new BadRequestException("User not found");
+        }
+    }
+
+    public boolean verifyPoliceToken(HttpServletRequest request, String loginId) {
+
+        try {
+            PoliceDetailsResponse policeDetailsResponse;
+            String url = "http://localhost:9091/admin/api/v1/get_police_officer_details?loginId=" + loginId;
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity requestEntity = new HttpEntity(null, headers);
+            ResponseEntity<PoliceDetailsResponse> re = restTemplate.exchange(url, HttpMethod.GET, requestEntity, PoliceDetailsResponse.class);
+            policeDetailsResponse = re.getBody();
+            String token = request.getHeader(TOKEN_HEADER);
+            token = token.replace("Bearer ","");
+            Algorithm algorithm = Algorithm.HMAC256("tokenSecret");
+            if (token != null) {
+                JWTVerifier verifier = JWT.require(algorithm)
+                        .withClaim("id", policeDetailsResponse.getLoginId())
+                        .withClaim("password", policeDetailsResponse.getPassword())
+                        .withClaim("contact", policeDetailsResponse.getContact())
+                        .build();
+                DecodedJWT jwt = verifier.verify(token);
+                return true;
+            } else {
+                throw new BadRequestException("Token not provided");
+            }
+        } catch (JWTVerificationException e) {
+            // in case of verification error a further filter will take care about authentication error
+            throw new BadRequestException("Authentication error. Token is not valid");
+        } catch (NullPointerException e) {
+            throw new BadRequestException("Token not provided");
+        } catch (Exception e) {
+            throw new BadRequestException("Police Officer not found");
         }
     }
 }

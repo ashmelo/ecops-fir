@@ -1,6 +1,7 @@
 package com.ecops.beans;
 
 import com.ecops.domain.CrimeStatus;
+import com.ecops.domain.FirStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,7 +28,7 @@ public class FirResponse {
     private int pincode;
     private String policeOfficerName;
     private String stationName;
-    private String status;
+    private FirStatus status;
     private String comments;
 
 }

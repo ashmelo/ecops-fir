@@ -10,4 +10,8 @@ public interface FirRepository extends JpaRepository<Fir,Integer> {
     List<Fir> findByUserId(String userId);
 
     Fir findByUserIdAndFirId(String userId, int firId);
+
+    List<Fir> findByPoliceOfficerId(int policeOfficerId);
+
+    Fir findByPoliceOfficerIdAndFirId(int policeOfficerId, int caseId);
 }

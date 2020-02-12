@@ -39,6 +39,8 @@ public class Fir {
     private String district;
     private String state;
     private int pincode;
-    private String status;
+
+    @Enumerated(EnumType.STRING)
+    private FirStatus status;
     private String comments;
 }

@@ -2,6 +2,7 @@ package com.ecops.service.impl;
 
 import com.ecops.beans.*;
 import com.ecops.domain.Fir;
+import com.ecops.domain.FirStatus;
 import com.ecops.exception.BadRequestException;
 import com.ecops.parameter.ApplicationParameter;
 import com.ecops.repository.FirRepository;
@@ -44,6 +45,7 @@ public class FirServiceImpl implements FirService {
                 .pincode(request.getPincode())
                 .state(request.getState())
                 .userId(request.getUserId())
+                .status(FirStatus.ASSIGNED)
                 .build();
         System.out.println("FIR Details saved");
         firRepository.saveAndFlush(fir);
@@ -73,6 +75,44 @@ public class FirServiceImpl implements FirService {
                 .description(fir.getDescription())
                 .policeOfficerName(fir.getPoliceOfficerName())
                 .stationName(fir.getStationName())
+                .status(fir.getStatus())
+                .comments(fir.getComments())
+                .incidentDate(fir.getIncidentDate())
+                .filedDate(fir.getFiledDate())
+                .address(fir.getAddress())
+                .district(fir.getDistrict())
+                .place(fir.getPlace())
+                .state(fir.getState())
+                .pincode(fir.getPincode())
+                .mobileNumber(fir.getMobileNumber())
+                .build();
+        return firResponse;
+    }
+
+    @Override
+    public List<AllFirResponse> getAllCases(String loginId) {
+        PoliceDetailsResponse policeDetailsResponse = this.getPoliceDetailsResponse(loginId);
+        List<AllFirResponse> firResponse = new ArrayList<>();
+        firRepository.findByPoliceOfficerId(policeDetailsResponse.getId()).forEach(fir -> {
+            AllFirResponse.AllFirResponseBuilder response = AllFirResponse.builder();
+            response.firId(fir.getFirId())
+                    .crimeType(fir.getCrimeCommit())
+                    .filedDate(fir.getFiledDate())
+                    .incidentDate(fir.getIncidentDate());
+            firResponse.add(response.build());
+        });
+        return firResponse;
+    }
+
+    @Override
+    public FirResponse getCaseDetails(String loginId, int caseId) {
+        PoliceDetailsResponse policeDetailsResponse = this.getPoliceDetailsResponse(loginId);
+        Fir fir = firRepository.findByPoliceOfficerIdAndFirId(policeDetailsResponse.getId(),caseId);
+        FirResponse firResponse = FirResponse.builder().firId(caseId)
+                .crimeCommit(fir.getCrimeCommit())
+                .description(fir.getDescription())
+                .policeOfficerName(fir.getPoliceOfficerName())
+                .stationName(fir.getStationName())
                 .status(fir .getStatus())
                 .comments(fir.getComments())
                 .incidentDate(fir.getIncidentDate())
@@ -85,6 +125,15 @@ public class FirServiceImpl implements FirService {
                 .mobileNumber(fir.getMobileNumber())
                 .build();
         return firResponse;
+    }
+
+    @Override
+    public void updateCaseStatus(String loginId, int caseId, UpdateCaseRequest updateCaseRequest) {
+        PoliceDetailsResponse policeDetailsResponse = this.getPoliceDetailsResponse(loginId);
+        Fir fir = firRepository.findByPoliceOfficerIdAndFirId(policeDetailsResponse.getId(),caseId);
+        fir.setStatus(updateCaseRequest.getStatus());
+        fir.setComments(updateCaseRequest.getComments());
+        firRepository.saveAndFlush(fir);
     }
 
     @Async
@@ -128,5 +177,17 @@ public class FirServiceImpl implements FirService {
             throw new BadRequestException("Error while assigning police officer");
         }
 
+    }
+
+    private PoliceDetailsResponse getPoliceDetailsResponse(String loginId){
+        PoliceDetailsResponse policeDetailsResponse = new PoliceDetailsResponse();
+        String url = "http://localhost:9091/admin/api/v1/get_police_officer_details?loginId=" + loginId;
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity requestEntity = new HttpEntity(null, headers);
+        ResponseEntity<PoliceDetailsResponse> re = restTemplate.exchange(url, HttpMethod.GET, requestEntity, PoliceDetailsResponse.class);
+        policeDetailsResponse = re.getBody();
+        return  policeDetailsResponse;
     }
 }
